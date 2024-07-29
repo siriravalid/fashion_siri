@@ -6,8 +6,15 @@ from PIL import Image
 
 # Load the model
 model_path = os.path.join(os.getcwd(), 'model.sav')
-with open(model_path, 'rb') as model_file:
-    model = pickle.load(model_file)
+try:
+    with open(model_path, 'rb') as model_file:
+        model = pickle.load(model_file)
+except FileNotFoundError:
+    st.error(f'Model file not found at path: {model_path}')
+    st.stop()
+except Exception as e:
+    st.error(f'Error loading the model: {e}')
+    st.stop()
 
 # Preprocess the image
 def preprocess_image(image):
@@ -32,7 +39,11 @@ if uploaded_file is not None:
     preprocessed_image = preprocess_image(image)
     
     # Make prediction
-    prediction = model.predict(preprocessed_image)
+    try:
+        prediction = model.predict(preprocessed_image)
+    except Exception as e:
+        st.error(f'Error making prediction: {e}')
+        st.stop()
     
     # Map prediction to class label
     class_labels = [
