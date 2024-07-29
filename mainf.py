@@ -3,6 +3,7 @@ import pickle
 import os
 import numpy as np
 from PIL import Image
+import keras
 
 # Load the model
 model_path = os.path.join(os.getcwd(), 'model.sav')
