@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from PIL import Image
 
-# Load the model
+# Ensure the model file path is correct
 model_path = 'model.sav'
 with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
