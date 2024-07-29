@@ -1,40 +1,43 @@
 import streamlit as st
 import pickle
-from PIL import Image
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from PIL import Image
 
-# Load the pre-trained model
-with open('model.sav', 'rb') as model_file:
+# Load the model
+model_path = 'model.sav'
+with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
 
-# Define a function to preprocess the image
+# Preprocess the image
 def preprocess_image(image):
-    # Convert image to grayscale and resize it to 28x28
-    image = image.convert('L').resize((28, 28))
-    image_array = np.array(image).reshape(1, -1)
-    # Normalize the image
-    scaler = StandardScaler()
-    image_array = scaler.fit_transform(image_array)
-    return image_array
+    image = image.convert('L')  # Convert image to grayscale
+    image = image.resize((28, 28))  # Resize image to 28x28
+    image = np.array(image)  # Convert image to array
+    image = image / 255.0  # Normalize pixel values
+    image = image.reshape(1, 28, 28, 1)  # Reshape for model input
+    return image
 
-# Streamlit app
-st.title("Fashion MNIST Image Classifier")
+# Streamlit UI
+st.title('Fashion MNIST Image Classification')
+st.write('Upload an image to classify it.')
 
-st.write("Upload an image to classify it.")
-
-# Upload image
 uploaded_file = st.file_uploader("Choose an image...", type="png")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
+    st.image(image, caption='Uploaded Image.', use_column_width=True)
     
     # Preprocess the image
-    image_array = preprocess_image(image)
+    preprocessed_image = preprocess_image(image)
     
-    # Predict the class
-    prediction = model.predict(image_array)
-    class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+    # Make prediction
+    prediction = model.predict(preprocessed_image)
     
-    st.write(f'This image is predicted to be a: {class_names[prediction[0]]}')
+    # Map prediction to class label
+    class_labels = [
+        'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+        'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
+    ]
+    predicted_class = class_labels[np.argmax(prediction)]
+    
+    st.write(f'This image is a: {predicted_class}')
