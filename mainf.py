@@ -1,10 +1,11 @@
 import streamlit as st
 import pickle
+import os
 import numpy as np
 from PIL import Image
 
-# Ensure the model file path is correct
-model_path = 'model.sav'
+# Load the model
+model_path = os.path.join(os.getcwd(), 'model.sav')
 with open(model_path, 'rb') as model_file:
     model = pickle.load(model_file)
 
